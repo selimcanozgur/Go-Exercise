@@ -2,103 +2,60 @@ package main
 
 import (
 	"fmt"
+
+	"example.com/bank/fileops"
+	"github.com/Pallinder/go-randomdata"
 )
 
-var bakiye = 1000.0
+const accountBalanceFile = "balance.txt"
 
 func main() {
+	var balance, err = fileops.ReadToBalance(accountBalanceFile)
 
-	fmt.Println("Bankaya hoş geldiniz")
+	if err != nil {
+		fmt.Println(err)
+		panic("Can't continue, sorry.")
+	}
+
+	fmt.Println("Welcome to banking app")
+	fmt.Println("Reach us 24/7",randomdata.PhoneNumber())
+	
+	optionFunc()
 
 	for {
-		fmt.Println("1- Bakiye durumu")
-		fmt.Println("2- Para yatır")
-		fmt.Println("3- Para çek")
-		fmt.Println("4- Çıkış yap")
-	
-		var secim int
-		fmt.Print("Bir seçim yapınız: ")
-		fmt.Scan(&secim)
+		fmt.Print("Enter a value: ")
+		var value float64
+		fmt.Scan(&value)
 
-		switch secim {
+		switch value {
 		case 1:
-			fmt.Println("Toplam bakiye", bakiye)
+			fmt.Println("Your balance: ", balance)
 		case 2:
-			var parayatir float64
-			fmt.Print("Yatırmak istediğiniz tutar: ")
-			fmt.Scan(&parayatir)
-	
-			if parayatir <= 0 {
-				fmt.Print("Yatırmak istediğiniz değer 0 veye altında olamaz")
+			fmt.Print("The amount you want to deposit: ")
+			var depositCount float64
+			fmt.Scan(&depositCount)
+			if depositCount <= 0 {
+				fmt.Print("The entered value is incorrect")
 				continue
 			}
-	
-			bakiye += parayatir
-			fmt.Println("Toplam bakiye", bakiye)
+			balance += depositCount
+			fileops.WriteToBalance(balance, accountBalanceFile)
 		case 3:
-			fmt.Print("Çekmek istediğiniz tutar: ")
-			var paracek float64
-			fmt.Scan(&paracek)
-	
-			if bakiye < paracek {
-				fmt.Println("Yetersiz bakiye")
+			fmt.Print("The amount you want to withdraw:: ")
+			var withdrawCount float64
+			fmt.Scan(&withdrawCount)
+			if balance < withdrawCount {
+				fmt.Print("Insufficient funds")
 				continue
 			}
-	
-			if paracek <= 0 {
-				fmt.Print("Çekmek istediğiniz değer 0 veye altında olamaz")
-				continue
-			}
-			
-			bakiye -= paracek 
-			fmt.Println("Toplam bakiye", bakiye)
-
+			balance -= withdrawCount
+			fileops.WriteToBalance(balance, accountBalanceFile)
 		default:
-			fmt.Println("İyi günler")
-			fmt.Println("Bizi tercih ettiğiniz için teşekkür ederiz...")
+			fmt.Println("Have a nice day")
+			fmt.Println("Thank you for choosing us")
 			return
 		}
+
 	}
-	
+
 }
-
-
-/*
-if secim == 1 {
-			fmt.Println("Toplam bakiye", bakiye)
-		} else if secim == 2 {
-	
-			var parayatir float64
-			fmt.Print("Yatırmak istediğiniz tutar: ")
-			fmt.Scan(&parayatir)
-	
-			if parayatir <= 0 {
-				fmt.Print("Yatırmak istediğiniz değer 0 veye altında olamaz")
-				continue
-			}
-	
-			bakiye += parayatir
-			fmt.Println("Toplam bakiye", bakiye)
-	
-		} else if secim == 3 {
-			fmt.Print("Çekmek istediğiniz tutar: ")
-			var paracek float64
-			fmt.Scan(&paracek)
-	
-			if bakiye < paracek {
-				fmt.Println("Yetersiz bakiye")
-				continue
-			}
-	
-			if paracek <= 0 {
-				fmt.Print("Çekmek istediğiniz değer 0 veye altında olamaz")
-				continue
-			}
-			
-			bakiye -= paracek 
-			fmt.Println("Toplam bakiye", bakiye)
-		} else {
-			fmt.Println("İyi günler.")
-			break
-		}
-*/
