@@ -3,8 +3,10 @@ package db
 import (
 	"database/sql"
 	"log"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 )
 
 var DB *sql.DB
@@ -14,7 +16,16 @@ func Connect() {
 
 	var err error
 
-	DB, err = sql.Open("mysql", "root:2662310350.z.Z@(127.0.0.1:3306)/rest_api?parseTime=true")
+	err = godotenv.Load()
+	
+	if err != nil {
+	  log.Fatal("Error loading .env file")
+	}
+
+	DB_URI := os.Getenv("DB_URI")
+
+
+	DB, err = sql.Open("mysql", DB_URI)
 
 	if err != nil {
 		panic("Veritabanı bağlantısı sağlanamadı")
