@@ -17,13 +17,11 @@ func Connect() {
 	var err error
 
 	err = godotenv.Load()
+	DB_URI := os.Getenv("DB_URI")
 	
 	if err != nil {
 	  log.Fatal("Error loading .env file")
 	}
-
-	DB_URI := os.Getenv("DB_URI")
-
 
 	DB, err = sql.Open("mysql", DB_URI)
 
@@ -35,7 +33,9 @@ func Connect() {
 	DB.SetMaxOpenConns(10) // Aynı anda açık olabilecek maksimum veritabanı bağlantısı
 	DB.SetMaxIdleConns(5) // Bağlantı havuzunda kullanılmadan bekletilebilecek maksimum bağlantı sayısı
 
-	if err := DB.Ping(); err != nil {
+	if err := DB.Ping();
+	
+	 err != nil {
 		log.Fatal("Veritabanı bağlantısı doğrulanamadı:", err)
 	}
 
@@ -44,6 +44,20 @@ func Connect() {
 
 
 func createTables() {
+
+	createUserTables := `
+	 CREATE TABLE IF NOT EXISTS users (
+	   id INT AUTO_INCREMENT PRIMARY KEY,
+	   email VARCHAR(255) NOT NULL UNIQUE,
+	   password TEXT NOT NULL
+	 )
+	`
+	_, err := DB.Exec(createUserTables)
+
+	if err != nil {
+		log.Fatal("Failed to create users table",err)
+	}
+
 	createEventTables := `
 	CREATE TABLE IF NOT EXISTS events (
 	  id INT AUTO_INCREMENT PRIMARY KEY,
@@ -51,11 +65,12 @@ func createTables() {
 	  description TEXT NOT NULL,
 	  location VARCHAR(255) NOT NULL,
 	  dateTime DATETIME NOT NULL,
-	  user_id INT
+	  user_id INT,
+	  FOREIGN KEY(user_id) REFERENCES users(id)
 	)`
 
-	_, err := DB.Exec(createEventTables)
+	_, err = DB.Exec(createEventTables)
 	if err != nil {
-		log.Fatal("Tablo oluşturulamadı:", err)
+		panic("Failed to create events table")
 	}
 }
